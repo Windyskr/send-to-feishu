@@ -4,131 +4,132 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Extension Settings | Send to Telegram</title>
+    <title>Extension Settings | Send to Feishu</title>
     <link rel="stylesheet" href="../assets/css/main.css">
     <link rel="stylesheet" href="../assets/css/settings.css">
     <link rel="stylesheet" href="../assets/css/input.css">
 </head>
 <body>
 <header role="banner">
-    <h1><span class="logo-small"></span> <span>Send to Telegram</span></h1>
+    <h1><span class="logo-small"></span> <span>Send to Feishu</span></h1>
 </header>
 <main role="main">
-<div class="tab-buttons" role="tablist">
-    <input class="legacy-tab-input" id="settings-tab-selector-1" data-target-id="1" aria-label="User Settings" type="radio" name="tabs" checked>
-    <button class="settings-tab-label" data-btn-id="1" role="tab" aria-controls="settings-tab-content-1" tabindex="0" aria-label="User Settings">User</button>
-    <input class="legacy-tab-input" id="settings-tab-selector-2" data-target-id="2" aria-label="Message Settings" type="radio" name="tabs">
-    <button class="settings-tab-label" data-btn-id="2" role="tab" aria-controls="settings-tab-content-2" tabindex="0" aria-label="Message Settings">Messages</button>
-    <input class="legacy-tab-input" id="settings-tab-selector-3" data-target-id="3" aria-label="Log Settings" type="radio" name="tabs">
-    <button class="settings-tab-label" data-btn-id="3" role="tab" aria-controls="settings-tab-content-3" tabindex="0" aria-label="Log Settings">Logs</button>
-</div>
-<div class="tab-contents">
-    <section id="settings-tab-content-1" class="form-section settings-main" role="tabpanel">
-        <fieldset>
-            <legend>Connection Settings</legend>
-            <div id="form-user-settings">
-                <div class="group">
-                    <input name="botToken" id="tokenInput" type="password" aria-label="Telegram bot token" required>
-                    <i id="token-eye" class="eyes-open"></i>
-                    <span class="highlight"></span>
-                    <span class="bar"></span>
-                    <label class="input-label">Bot Token</label>
+    <div class="tab-buttons" role="tablist">
+        <input class="legacy-tab-input" id="settings-tab-selector-1" data-target-id="1" aria-label="User Settings" type="radio" name="tabs" checked>
+        <button class="settings-tab-label" data-btn-id="1" role="tab" aria-controls="settings-tab-content-1" tabindex="0" aria-label="User Settings">User</button>
+        <input class="legacy-tab-input" id="settings-tab-selector-2" data-target-id="2" aria-label="Message Settings" type="radio" name="tabs">
+        <button class="settings-tab-label" data-btn-id="2" role="tab" aria-controls="settings-tab-content-2" tabindex="0" aria-label="Message Settings">Messages</button>
+        <input class="legacy-tab-input" id="settings-tab-selector-3" data-target-id="3" aria-label="Log Settings" type="radio" name="tabs">
+        <button class="settings-tab-label" data-btn-id="3" role="tab" aria-controls="settings-tab-content-3" tabindex="0" aria-label="Log Settings">Logs</button>
+    </div>
+    <div class="tab-contents">
+        <section id="settings-tab-content-1" class="form-section settings-main" role="tabpanel">
+            <fieldset>
+                <legend>Connection Settings</legend>
+                <div id="form-user-settings">
+                    <div class="group">
+                        <input name="appId" id="appIdInput" type="text" aria-label="Feishu App ID" required>
+                        <span class="highlight"></span>
+                        <span class="bar"></span>
+                        <label class="input-label">App ID</label>
+                    </div>
+                    <div class="group">
+                        <input name="appSecret" id="appSecretInput" type="password" aria-label="Feishu App Secret" required>
+                        <i id="app-secret-eye" class="eyes-open"></i>
+                        <span class="highlight"></span>
+                        <span class="bar"></span>
+                        <label class="input-label">App Secret</label>
+                    </div>
+                    <div class="group">
+                        <input name="chatId" id="chatIdInput" type="text" aria-label="Feishu chat id" required>
+                        <span class="highlight"></span>
+                        <span class="bar"></span>
+                        <label class="input-label">Chat ID</label>
+                    </div>
                 </div>
-                <div class="group">
-                    <input name="chatId"id="chatIdInput" type="password" aria-label="Telegram chat id" required>
-                    <i id="chat-id-eye" class="eyes-open"></i>
-                    <span class="highlight"></span>
-                    <span class="bar"></span>
-                    <label class="input-label">Chat ID</label>
+            </fieldset>
+        </section>
+        <section id="settings-tab-content-2" class="form-section" role="tabpanel">
+            <fieldset>
+                <legend>
+                    <span></span>
+                    <label for="message-type-selector">Message Type:</label>
+                    <select name="message-type-selector" id="message-type-selector">
+                        <option value="text">📝 Text</option>
+                        <option value="image">🏞️ Image</option>
+                    </select>
+                </legend>
+                <div id="text-message-options">
+                    <div class="options-field">
+                        <input type="checkbox" id="opt-text-silent-message" name="opt-text-silent-message">
+                        <label for="opt-text-silent-message">Disable message notification sound</label>
+                    </div>
+                    <div class="options-field">
+                        <input type="checkbox" id="opt-text-disable-preview" name="opt-text-disable-preview">
+                        <label for="opt-text-disable-preview">Disable link preview</label>
+                    </div>
+                    <div class="options-field">
+                        <input type="checkbox" id="opt-text-add-source-link" name="opt-text-add-source-link">
+                        <label for="opt-text-add-source-link">Add source link to the message</label>
+                    </div>
                 </div>
-            </div>
-        </fieldset>
-    </section>
-    <section id="settings-tab-content-2" class="form-section" role="tabpanel">
-        <fieldset>
-            <legend>
-                <span></span>
-                <label for="message-type-selector">Message Type:</label>
-                <select name="message-type-selector" id="message-type-selector">
-                    <option value="text">📝 Text</option>
-                    <option value="photo">🏞️ Photo</option>
-                </select>
-            </legend>
-            <div id="text-message-options">
-                <div class="options-field">
-                    <input type="checkbox" id="opt-text-silent-message" name="opt-text-silent-message">
-                    <label for="opt-text-silent-message">Disable message notification sound</label>
+                <div id="image-message-options">
+                    <div class="options-field">
+                        <input type="checkbox" id="opt-image-silent-message" name="opt-image-silent-message">
+                        <label for="opt-image-silent-message">Disable message notification sound</label>
+                    </div>
+                    <div class="options-field">
+                        <input type="checkbox" id="opt-image-add-source-link" name="opt-image-add-source-link">
+                        <label for="opt-image-add-source-link">Add source link to the message</label>
+                    </div>
+                    <hr>
+                    <div class="options-field">
+                        <input type="radio" id="opt-image-send-as-image" name="image-message-type" value="image">
+                        <label for="opt-image-send-as-image">Send as image</label>
+                    </div>
+                    <div class="options-field">
+                        <input type="radio" id="opt-image-send-as-file" name="image-message-type" value="file">
+                        <label for="opt-image-send-as-file">Send as file</label>
+                    </div>
+                    <div class="options-field">
+                        <input type="radio" id="opt-image-send-as-link" name="image-message-type" value="link">
+                        <label for="opt-image-send-as-link">Send as link <span>(Don't upload)</span></label>
+                    </div>
                 </div>
-                <div class="options-field">
-                    <input type="checkbox" id="opt-text-disable-preview" name="opt-text-disable-preview">
-                    <label for="opt-text-disable-preview">Disable link preview</label>
+            </fieldset>
+        </section>
+        <section id="settings-tab-content-3" class="form-section" role="tabpanel">
+            <fieldset>
+                <legend>
+                    <span>Activity Logs</span>
+                    <label class="logs-switch" aria-label="Activity logs">
+                        <input id="logs-switch-checkbox" type="checkbox" role="switch" tabindex="0" aria-label="Keep activity logs">
+                        <span id="logs-switch-span" class="logs-slider logs-slider-round" aria-hidden="true" tabindex="-1"></span>
+                    </label>
+                </legend>
+                <div id="logging-options">
+                    <p>All message and activity logs are <span class="log-info-text">stored locally</span>
+                        on your browser and <span class="log-info-text">not shared</span> with anywhere else.
+                        No logs will be recorded in Incognito Mode.
+                    </p>
+                    <div class="options-field">
+                        <input type="radio" id="log-timestamp-only" name="logging-type" value="timestamp"
+                               checked>
+                        <label for="log-timestamp-only">Store message timestamps only</label>
+                    </div>
+                    <div class="options-field">
+                        <input type="radio" id="log-everything" name="logging-type" value="everything">
+                        <label for="log-everything">Store everything including message data</label>
+                    </div>
                 </div>
-                <div class="options-field">
-                    <input type="checkbox" id="opt-text-add-source-link" name="opt-text-add-source-link">
-                    <label for="opt-text-add-source-link">Add source link to the message</label>
-                </div>
-            </div>
-            <div id="image-message-options">
-                <div class="options-field">
-                    <input type="checkbox" id="opt-image-silent-message" name="opt-image-silent-message">
-                    <label for="opt-image-silent-message">Disable message notification sound</label>
-                </div>
-                <div class="options-field">
-                    <input type="checkbox" id="opt-image-add-source-link" name="opt-image-add-source-link">
-                    <label for="opt-image-add-source-link">Add source link to the message</label>
-                </div>
-<!--                <div class="options-field">-->
-<!--                    <input type="checkbox" id="opt-image-use-weserv-proxy" name="opt-image-use-weserv-proxy">-->
-<!--                    <label for="opt-image-use-weserv-proxy">Use weserv.nl cache while uploading</label>-->
-<!--                </div>-->
-                <hr>
-                <div class="options-field">
-                    <input type="radio" id="opt-image-send-as-photo" name="image-message-type" value="photo">
-                    <label for="opt-image-send-as-photo">Send as photo <span>(Compressed)</span></label>
-                </div>
-                <div class="options-field">
-                    <input type="radio" id="opt-image-send-as-document" name="image-message-type" value="document">
-                    <label for="opt-image-send-as-document">Send as document <span>(Not Compressed)</span></label>
-                </div>
-                <div class="options-field">
-                    <input type="radio" id="opt-image-send-as-link" name="image-message-type" value="link">
-                    <label for="opt-image-send-as-link">Send as link <span>(Don't upload)</span></label>
-                </div>
-            </div>
-        </fieldset>
-    </section>
-    <section id="settings-tab-content-3" class="form-section" role="tabpanel">
-        <fieldset>
-            <legend>
-                <span>Activity Logs</span>
-                <label class="logs-switch" aria-label="Activity logs">
-                    <input id="logs-switch-checkbox" type="checkbox" role="switch" tabindex="0" aria-label="Keep activity logs">
-                    <span id="logs-switch-span" class="logs-slider logs-slider-round" aria-hidden="true" tabindex="-1"></span>
-                </label>
-            </legend>
-            <div id="logging-options">
-                <p>All message and activity logs are <span class="log-info-text">stored locally</span>
-                    on your browser and <span class="log-info-text">not shared</span> with anywhere else.
-                    No logs will be recorded in Incognito Mode.
-                </p>
-                <div class="options-field">
-                    <input type="radio" id="log-timestamp-only" name="logging-type" value="timestamp"
-                           checked>
-                    <label for="log-timestamp-only">Store message timestamps only</label>
-                </div>
-                <div class="options-field">
-                    <input type="radio" id="log-everything" name="logging-type" value="everything">
-                    <label for="log-everything">Store everything including message data</label>
-                </div>
-            </div>
-            <p></p>
-        </fieldset>
-    </section>
-</div>
+                <p></p>
+            </fieldset>
+        </section>
+    </div>
     <section class="save-settings">
         <span>
-            Join our  <a target="_blank" href="https://t.me/send_to_telegram" tabindex="0" aria-label="Telegram channel of the extension">channel</a>
-            <br> for the updates. 📣
+            Visit our <a target="_blank" href="https://www.feishu.cn/" tabindex="0" aria-label="Feishu official website">website</a>
+            <br> for more information. 📣
         </span>
         <button id="save-all-settings" class="save-button">Save</button>
     </section>

@@ -5,15 +5,15 @@ import { getIconPath } from '../../utils/getIconPath.js';
 const selectById = (id) => document.getElementById(id);
 const selectCheckedRadioByName = (name) => document.querySelector(`input[name="${name}"]:checked`);
 
-const [toggleTokenVisibility, toggleChatIdVisibility] = [selectById('token-eye'), selectById('chat-id-eye')];
-const [tokenInput, chatIdInput] = [selectById('tokenInput'), selectById('chatIdInput')];
+const [toggleAppSecretVisibility, toggleChatIdVisibility] = [selectById('app-secret-eye'), selectById('chat-id-eye')];
+const [appIdInput, appSecretInput, chatIdInput] = [selectById('appIdInput'), selectById('appSecretInput'), selectById('chatIdInput')];
 
 const handleEyeSwitch = function (inputSelector) {
     this.classList.toggle('eyes-wide-shut');
     inputSelector.setAttribute('type', inputSelector.getAttribute('type') === 'password' ? 'text' : 'password');
 };
 
-toggleTokenVisibility.addEventListener('click', handleEyeSwitch.bind(toggleTokenVisibility, tokenInput));
+toggleAppSecretVisibility.addEventListener('click', handleEyeSwitch.bind(toggleAppSecretVisibility, appSecretInput));
 toggleChatIdVisibility.addEventListener('click', handleEyeSwitch.bind(toggleChatIdVisibility, chatIdInput));
 
 const messageTypeSelector = selectById('message-type-selector');
@@ -22,7 +22,6 @@ const imageMessageOptionsContainer = selectById('image-message-options');
 const saveButtonSelector = selectById('save-all-settings');
 
 const handleMessageSettingsChange = () => {
-
     const messageType = messageTypeSelector.value;
 
     if (messageType === 'text') {
@@ -30,13 +29,12 @@ const handleMessageSettingsChange = () => {
         textMessageOptionsContainer.style.display = 'block';
     }
 
-    if (messageType === 'photo') {
+    if (messageType === 'image') {
         textMessageOptionsContainer.style.display = 'none';
         imageMessageOptionsContainer.style.display = 'block';
     }
 
     window.parent.postMessage('resize', '*');
-
 };
 
 messageTypeSelector.addEventListener('change', handleMessageSettingsChange);
@@ -47,7 +45,6 @@ const loggingOptionsSelector = selectById('logging-options');
 const disableLoggingOptions = bool => [...document.getElementsByName('logging-type')].map(el => el.disabled = bool);
 
 const toggleActivityLogStatus = () => {
-
     if (logSwitchSelector.checked) {
         loggingOptionsSelector.classList.remove('disabled-log-field');
         disableLoggingOptions(false);
@@ -55,7 +52,6 @@ const toggleActivityLogStatus = () => {
         loggingOptionsSelector.classList.add('disabled-log-field');
         disableLoggingOptions(true);
     }
-
 };
 
 document.addEventListener('DOMContentLoaded', toggleActivityLogStatus);
@@ -70,7 +66,8 @@ const getSelectedOptions = activeTab => {
                     setup: {
                         0: {
                             name: 'Default',
-                            key: selectById('tokenInput').value,
+                            appId: selectById('appIdInput').value,
+                            appSecret: selectById('appSecretInput').value,
                             chatId: selectById('chatIdInput').value
                         }
                     }
@@ -87,7 +84,6 @@ const getSelectedOptions = activeTab => {
                     sendImage: {
                         disableNotificationSound: selectById('opt-image-silent-message').checked,
                         addSourceLink: selectById('opt-image-add-source-link').checked,
-                        // useWeservProxy: selectById('opt-image-use-weserv-proxy').checked,
                         sendAs: selectCheckedRadioByName('image-message-type').value
                     }
                 }
@@ -104,13 +100,18 @@ const getSelectedOptions = activeTab => {
     }
 };
 
-const isValidToken = str => {
-    const regex = /^\d{8,10}:[A-Za-z0-9_-]{35}$/;
+const isValidAppId = str => {
+    const regex = /^[A-Za-z0-9_-]{10,}$/;
+    return regex.test(str);
+};
+
+const isValidAppSecret = str => {
+    const regex = /^[A-Za-z0-9_-]{20,}$/;
     return regex.test(str);
 };
 
 const isValidChatId = str => {
-    const regex = /^-?\d+$/;
+    const regex = /^[A-Za-z0-9_-]+$/;
     return regex.test(str);
 };
 
@@ -127,13 +128,16 @@ const getUserSettings = async () => {
 };
 
 const validateConnectionSettings = () => {
-    if (!isValidToken(tokenInput.value)) {
-        tokenInput.classList.add('invalid-input');
+    if (!isValidAppId(appIdInput.value)) {
+        appIdInput.classList.add('invalid-input');
+    }
+    if (!isValidAppSecret(appSecretInput.value)) {
+        appSecretInput.classList.add('invalid-input');
     }
     if (!isValidChatId(chatIdInput.value)) {
         chatIdInput.classList.add('invalid-input');
     }
-    return !(!isValidToken(tokenInput.value) || !isValidChatId(chatIdInput.value));
+    return isValidAppId(appIdInput.value) && isValidAppSecret(appSecretInput.value) && isValidChatId(chatIdInput.value);
 };
 
 const validateActionSettings = () => {
@@ -141,7 +145,7 @@ const validateActionSettings = () => {
     for (const type in actions) {
         for (const option in actions[type]) {
             const value = actions[type][option];
-            if (!(typeof value === 'boolean' || (typeof value === 'string' && ['photo', 'document', 'link'].includes(value)))) {
+            if (!(typeof value === 'boolean' || (typeof value === 'string' && ['image', 'file', 'link'].includes(value)))) {
                 return false;
             }
         }
@@ -237,7 +241,8 @@ const removeInvalidInputClass = function () {
     this.classList.contains('invalid-input') && this.classList.remove('invalid-input');
 };
 
-tokenInput.addEventListener('click', removeInvalidInputClass);
+appIdInput.addEventListener('click', removeInvalidInputClass);
+appSecretInput.addEventListener('click', removeInvalidInputClass);
 chatIdInput.addEventListener('click', removeInvalidInputClass);
 
 const populateSettings = async function () {
@@ -245,7 +250,8 @@ const populateSettings = async function () {
 
     // Connections
     const [connection] = Object.values(setup);
-    tokenInput.value = connection.key;
+    appIdInput.value = connection.appId;
+    appSecretInput.value = connection.appSecret;
     chatIdInput.value = connection.chatId;
 
     selectById('opt-text-silent-message').checked = sendMessage.disableNotificationSound;
@@ -254,7 +260,6 @@ const populateSettings = async function () {
 
     selectById('opt-image-silent-message').checked = sendImage.disableNotificationSound;
     selectById('opt-image-add-source-link').checked = sendImage.addSourceLink;
-    // selectById('opt-image-use-weserv-proxy').checked = sendImage.useWeservProxy;
     selectById(`opt-image-send-as-${sendImage.sendAs}`).checked = true;
 
     // Logs
@@ -275,9 +280,9 @@ const handleActiveTab = function () {
 };
 
 [...document.querySelectorAll('.settings-tab-label')].forEach(element => {
-   element.addEventListener('click', function () {
-       document.querySelector(`#settings-tab-selector-${this.dataset.btnId}`).checked = true;
-       handleActiveTab();
-       window.parent.postMessage('resize', '*');
-   });
+    element.addEventListener('click', function () {
+        document.querySelector(`#settings-tab-selector-${this.dataset.btnId}`).checked = true;
+        handleActiveTab();
+        window.parent.postMessage('resize', '*');
+    });
 });

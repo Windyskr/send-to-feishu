@@ -39,7 +39,7 @@ const getLastMessageByStatus = async status => {
     const logs = await getStorageData('messageLogs');
     const firstOfType = logs && logs.find(log => log.status === status);
     if (firstOfType) {
-        const modifiedType = firstOfType.type === 'document' ? 'photo' : firstOfType.type;
+        const modifiedType = firstOfType.type === 'document' ? 'file' : firstOfType.type;
         return `• ${uppercaseFirstLetter(modifiedType)} at ${timestampToReadableDate(firstOfType.timestamp)}`;
     } else {
         return '• No messages yet.';
@@ -105,6 +105,6 @@ const initializeStatusMessage = async () => {
 
 chrome.runtime.onMessage.addListener(function (request) {
     if (request.message === 'returnConnectionStatus') {
-        updateStatusAfterDelay(request?.data?.ok, 600);
+        updateStatusAfterDelay(request?.data?.code === 0, 600);
     }
 });

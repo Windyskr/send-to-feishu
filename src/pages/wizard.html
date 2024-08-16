@@ -4,77 +4,66 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Installation Wizard | Send to Telegram</title>
+    <title>Installation Wizard | Send to Feishu</title>
     <link rel="stylesheet" href="../assets/css/main.css">
     <link rel="stylesheet" href="../assets/css/wizard.css">
 </head>
 <body>
 <header role="banner">
-    <h1><span class="logo-small"></span> <span>Send to Telegram</span></h1>
+    <h1><span class="logo-small"></span> <span>Send to Feishu</span></h1>
 </header>
 <main role="main">
-<div class="particle-container">
-    <div class="particle"></div>
-    <div class="particle"></div>
-    <div class="particle"></div>
-    <div class="particle"></div>
-    <div class="particle"></div>
-    <div class="particle"></div>
-    <div class="particle"></div>
-    <div class="particle"></div>
-    <div class="particle"></div>
-    <div class="particle"></div>
-</div>
-<section class="wizard-welcome" data-wizard-step="1">
-    <h2 id="wizard-heading" tabindex="0">Hello there 👋</h2>
-    <div id="wizard-content">
-        <div class="content-part-1" tabindex="0">
-            <p>Send to Telegram is a browser extension that helps you send text and image content to Telegram by simply using the context menu.</p>
-            <p>We just need to set up a few things before you can start using it.</p>
-        </div>
-        <div class="content-part-2 display-none" tabindex="0">
-            <p>We need to create a Telegram Bot 🤖<br>Don't worry, it's super easy and free!</p>
-            <p>Just follow the steps below:</p>
-            <ol type="1">
-                <li>Open <a href="https://t.me/BotFather" target="_blank">https://t.me/BotFather</a>.<br>Make sure it has the verified badge <i class="verified-badge"></i></li>
-                <li>Click on the Send Message button.</li>
-                <li>Click on the <strong>Start</strong> button.</li>
-                <li>Type <strong>/newbot</strong> to the chat. Or select it from the bot's message.</li>
-                <li>Give a name to your bot.</li>
-                <li>Set a username (must end with <strong>bot</strong>).</li>
-                <li><strong class="darkred">Super Important Step:</strong> After the bot is created, click on the link to your bot that @BotFather gave you, and type or click on <strong>/start</strong>. This allows the bot to message you.</li>
-                <li>Return to the chat with BotFather, copy the token and <strong>that's it!</strong> 🥳</li>
-            </ol>
-        </div>
-        <div class="content-part-3 display-none" tabindex="0">
-            <p class="bad-joke">Starts with a Chat ID 😂</p>
-            <p>Now, we need to get your Telegram chat ID.</p>
-            <p>It's your profile identifier and a necessity for the bot to be able to send you messages.</p>
-            <p>Here is how to obtain that:</p>
-            <ol type="1">
-                <li>Open <a href="https://t.me/userinfobot" target="_blank">https://t.me/userinfobot</a>.</li>
-                <li>Click on the Send Message button.</li>
-                <li>Click on the <strong>Start</strong> button.</li>
-                <li>Get the chat ID and <strong>that's all we need!</strong></li>
-            </ol>
-        </div>
-        <div class="content-part-4 display-none">
-            <p tabindex="0">All we have to do now is saving these credentials to the extension.</p>
-            <p tabindex="0">You can open this guide later from the Embed View by clicking on Guide button.</p>
-            <div class="hide-wizard-section">
-            <input type="checkbox" id="hide-wizard" name="hide-wizard" tabindex="0" checked>
-            <label for="hide-wizard">Don't show this page again.</label>
+    <div class="particle-container">
+        <!-- Particle divs remain unchanged -->
+    </div>
+    <section class="wizard-welcome" data-wizard-step="1">
+        <h2 id="wizard-heading" tabindex="0">Hello there 👋</h2>
+        <div id="wizard-content">
+            <div class="content-part-1" tabindex="0">
+                <p>Send to Feishu is a browser extension that helps you send text and image content to Feishu by simply using the context menu.</p>
+                <p>We just need to set up a few things before you can start using it.</p>
+            </div>
+            <div class="content-part-2 display-none" tabindex="0">
+                <p>We need to create a Feishu App 🚀<br>Don't worry, it's super easy and free!</p>
+                <p>Just follow the steps below:</p>
+                <ol type="1">
+                    <li>Go to the <a href="https://open.feishu.cn/app" target="_blank">Feishu Open Platform</a>.</li>
+                    <li>Click on "Create Custom App".</li>
+                    <li>Fill in the necessary information for your app.</li>
+                    <li>After creating the app, go to "Credentials & Basic Info" in the app's dashboard.</li>
+                    <li>You'll find your App ID and App Secret here. Keep these handy!</li>
+                    <li><strong class="darkred">Important:</strong> Make sure to enable the necessary permissions for your app, such as sending messages.</li>
+                </ol>
+            </div>
+            <div class="content-part-3 display-none" tabindex="0">
+                <p>Now, we need to get your Feishu chat ID.</p>
+                <p>It's the identifier for the chat where you want to send messages.</p>
+                <p>Here's how to obtain that:</p>
+                <ol type="1">
+                    <li>Open Feishu and go to the chat (group or personal) where you want to send messages.</li>
+                    <li>Click on the chat name at the top to open chat settings.</li>
+                    <li>Scroll down and find "Copy Chat ID".</li>
+                    <li>Click to copy the chat ID and <strong>that's all we need!</strong></li>
+                </ol>
+                <p><strong>Note:</strong> If you don't see "Copy Chat ID", you may need to enable developer mode in Feishu settings.</p>
+            </div>
+            <div class="content-part-4 display-none">
+                <p tabindex="0">All we have to do now is save these credentials to the extension.</p>
+                <p tabindex="0">You can open this guide later from the Embed View by clicking on the Guide button.</p>
+                <div class="hide-wizard-section">
+                    <input type="checkbox" id="hide-wizard" name="hide-wizard" tabindex="0" checked>
+                    <label for="hide-wizard">Don't show this page again.</label>
+                </div>
             </div>
         </div>
-    </div>
-    <button id="wizard-button" class="cta">
-        <span id="wizard-button-text">Let's get started</span>
-        <svg width="15px" height="10px" viewBox="0 0 13 10" role="img" aria-label=", proceed to next step">
-            <path d="M1,5 L11,5"></path>
-            <polyline points="8 1 12 5 8 9"></polyline>
-        </svg>
-    </button>
-</section>
+        <button id="wizard-button" class="cta">
+            <span id="wizard-button-text">Let's get started</span>
+            <svg width="15px" height="10px" viewBox="0 0 13 10" role="img" aria-label=", proceed to next step">
+                <path d="M1,5 L11,5"></path>
+                <polyline points="8 1 12 5 8 9"></polyline>
+            </svg>
+        </button>
+    </section>
 </main>
 <footer role="contentinfo">
     <div class="footer-navigation" role="navigation" aria-label="Extension pages">

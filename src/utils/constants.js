@@ -4,7 +4,8 @@ export const defaultSettings = {
         setup: {
             0: {
                 name: 'Default',
-                key: '',
+                appId: '',
+                appSecret: '',
                 chatId: ''
             }
         },
@@ -12,16 +13,12 @@ export const defaultSettings = {
     actions: {
         sendMessage: {
             disableNotificationSound: true,
-            disablePreview: true,
             addSourceLink: true
         },
         sendImage: {
             disableNotificationSound: true,
-            disablePreview: false,
-            sendAs: 'photo', // or 'document' - 'link'?
-            addSourceLink: true,
-            useWeservProxy: false
-            // prefetch weserv url?
+            sendAs: 'image', // or 'file' - 'link'
+            addSourceLink: true
         }
     },
     logs: {
@@ -30,8 +27,8 @@ export const defaultSettings = {
     }
 };
 
-export const messageTypes = ['text', 'photo', 'document', 'link', 'page', 'me'];
+export const messageTypes = ['text', 'image', 'file', 'link', 'page'];
 
 export const iconTypes = [...messageTypes, 'noLogs', 'tabUrl', 'deleteLog', 'success', 'success-bold', 'fail', 'calendar'];
 
-export const apiBaseUrl = 'https://api.telegram.org';
+export const apiBaseUrl = 'https://open.feishu.cn/open-apis/im/v1';

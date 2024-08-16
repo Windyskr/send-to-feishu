@@ -1,17 +1,17 @@
 import { defaultSettings, messageTypes } from './utils/constants.js';
 import { getStorageData, setStorageData } from './utils/storage.js';
 
-//Add context menu items and set default settings on install
+// Add context menu items and set default settings on install
 const contextTypes = ['text', 'link', 'page', 'image'];
 chrome.runtime.onInstalled.addListener(async details => {
     contextTypes.forEach(type =>
         chrome.contextMenus.create({
             id: type,
-            title: `Send this ${type} to Telegram`,
+            title: `Send this ${type} to Feishu`,
             contexts: [type === 'text' ? 'selection' : type]
         })
     );
-    //Set default settings if not set
+    // Set default settings if not set
     const options = await getStorageData('options');
     if (!options || Object.keys(options).length === 0) {
         await setStorageData('options', defaultSettings);
@@ -46,39 +46,13 @@ const buildContentData = async (click, tabUrl) => {
     }
 };
 
-// Get the file extension from the given URL string
-const getFileExtension = function (url) {
-    const path = new URL(url).pathname;
-    if (!path.includes('.')) {
-        return false;
-    }
-    return path.substring(path.lastIndexOf('.') + 1, path.length);
-};
-
-// Override the message type for certain file extensions to reach better results
-const overrideMessageType = function (content, options) {
-    if (options.actions.sendImage.sendAs === 'link') {
-        return 'link';
-    }
-    const fileExtension = getFileExtension(content);
-    switch (fileExtension) {
-        case 'webp':
-        case 'gif':
-            return 'document';
-        case 'svg':
-            return 'link';
-        default:
-            return options.actions.sendImage.sendAs;
-    }
-};
-
 // Listen for content from context menu and trigger sendMessage function
 chrome.contextMenus.onClicked.addListener(async (click, tab) => {
     if (!contextTypes.includes(click.menuItemId)) {
         return false;
     }
     const options = await getStorageData('options');
-    const messageType = click.menuItemId !== 'image' ? click.menuItemId : overrideMessageType(click.srcUrl, options);
+    const messageType = click.menuItemId;
     const tabUrl = await parseTabUrl(click, tab.url);
     const messageData = await buildContentData(click, tabUrl);
     await sendMessage(messageData, messageType, tab);
@@ -89,26 +63,28 @@ chrome.runtime.onMessage.addListener(async request => {
     if (request.message === 'getConnectionStatus') {
         const options = await getStorageData('options');
 
-        const botToken = options.connections.setup[options.connections.use].key;
-        if (!botToken) {
+        const appToken = options.connections.setup[options.connections.use].key;
+        if (!appToken) {
             return await chrome.runtime.sendMessage({
                 message: 'returnConnectionStatus',
-                data: { ok: false, description: 'No token was provided.' }
+                data: { code: 400, msg: 'No token was provided.' }
             });
         }
 
-        const requestURL = buildRequestURL('me', options);
-        const getMe = await fetchAPI(requestURL, {});
+        const requestURL = 'https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal';
+        const getToken = await fetchAPI(requestURL, {
+            app_id: options.connections.setup[options.connections.use].appId,
+            app_secret: appToken
+        });
 
         return await chrome.runtime.sendMessage({
             message: 'returnConnectionStatus',
-            data: await getMe.json(),
+            data: await getToken.json(),
         });
     }
 });
 
-//Function to check if given URL is valid
-//Author @Pavlo https://stackoverflow.com/a/43467144
+// Function to check if given URL is valid
 const isValidURL = function (string) {
     let url;
     try {
@@ -119,45 +95,21 @@ const isValidURL = function (string) {
     return url.protocol === 'http:' || url.protocol === 'https:';
 };
 
-// Get the Telegram Bot API method name by message type
-const getMessageType = function (type) {
-    switch (type) {
-        case 'text':
-        case 'link':
-        case 'page':
-            return '/sendMessage';
-        case 'photo':
-            return '/sendPhoto';
-        case 'document':
-            return '/sendDocument';
-        case 'me':
-            return '/getMe';
-        default:
-            return false;
-    }
-};
-
-// Build the Telegram Bot API request URL by message type and active account
-const buildRequestURL = function (type, options) {
-    return 'https://api.telegram.org/bot' + options.connections.setup[options.connections.use].key + getMessageType(type);
+// Build the Feishu API request URL
+const buildRequestURL = function () {
+    return 'https://open.feishu.cn/open-apis/im/v1/messages';
 };
 
 // Build the message content object by message type
 const buildContentByType = function (type, content) {
     switch (type) {
         case 'text':
-            return { type: 'text', content: content.text };
+            return { msg_type: 'text', content: JSON.stringify({ text: content.text }) };
         case 'link':
-            if (!content.linkUrl && content.srcUrl) {
-                content.linkUrl = content.srcUrl;
-            }
-            return { type: 'text', content: content.linkUrl };
         case 'page':
-            return { type: 'text', content: content.pageUrl };
-        case 'photo':
-            return { type: 'photo', content: content.srcUrl };
-        case 'document':
-            return { type: 'document', content: content.srcUrl };
+            return { msg_type: 'text', content: JSON.stringify({ text: content.linkUrl || content.pageUrl }) };
+        case 'image':
+            return { msg_type: 'image', content: JSON.stringify({ image_key: content.srcUrl }) };
         default:
             return false;
     }
@@ -165,34 +117,14 @@ const buildContentByType = function (type, content) {
 
 // Build the request parameters object by message type and user settings
 const buildPostData = function (type, content, options) {
-
     if (!messageTypes.includes(type)) {
         throw new Error(`Unrecognized message type: ${type}`);
     }
 
-    const typeKey = `send${['photo', 'document'].includes(type) ? 'Image' : 'Message'}`;
-
     const parameters = {
-        chat_id: options.connections.setup[options.connections.use].chatId,
-        disable_notification: options.actions[typeKey].disableNotificationSound,
-        disable_web_page_preview: options.actions[typeKey].disablePreview
+        receive_id: options.connections.setup[options.connections.use].chatId,
+        ...buildContentByType(type, content)
     };
-
-    const userContent = buildContentByType(type, content);
-
-    if (['photo', 'document'].includes(type)) {
-        userContent['type'] = overrideMessageType(userContent['content'], options);
-    }
-
-    parameters[userContent['type']] = userContent['content'];
-
-    if (options.actions[typeKey].addSourceLink && isValidURL(content.tabUrl) && type !== 'page') {
-        parameters.reply_markup = {
-            inline_keyboard: [
-                [{ text: 'Source', url: content.tabUrl }]
-            ],
-        };
-    }
 
     return parameters;
 };
@@ -202,28 +134,47 @@ const fetchAPI = async function (url, postData) {
     const options = {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json; charset=utf-8',
+            'Authorization': `Bearer ${await getTenantAccessToken()}`
         },
-        body: postData ? JSON.stringify(postData) : undefined
+        body: JSON.stringify(postData)
     };
     try {
         return await fetch(url, options);
     } catch (error) {
-        return JSON.stringify({ ok: false, description: `Error while sending the request: ${error}` });
+        return JSON.stringify({ code: 500, msg: `Error while sending the request: ${error}` });
     }
+};
+
+// Get tenant access token
+const getTenantAccessToken = async function () {
+    const options = await getStorageData('options');
+    const url = 'https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal';
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            app_id: options.connections.setup[options.connections.use].appId,
+            app_secret: options.connections.setup[options.connections.use].key
+        })
+    });
+    const data = await response.json();
+    return data.tenant_access_token;
 };
 
 // Register the API response to the extension storage to use it later,
 // and throw error with api response and stack trace if response is not ok
 const handleAPIResponse = async function (data) {
     await setStorageData('lastAPIResponse', data);
-    if (data.ok) {
+    if (data.code === 0) {
         return true;
     }
     else {
         throw({
-            status: data['error_code'],
-            description: data.description,
+            status: data.code,
+            description: data.msg,
             stackTrace: new Error()
         });
     }
@@ -247,35 +198,21 @@ const registerLog = async function (content, response, type) {
         logs.unshift(buildLogObject(content, response, type, options));
         await setStorageData('messageLogs', logs);
     }
-    if (response.ok) {
+    if (response.code === 0) {
         await setStorageData('totalMessageCount', total + 1);
     }
 };
 
-const getFileIDsFromResponse = function (result) {
-    let type = '';
-    ['photo', 'document', 'sticker'].forEach(key => result[key] ? type = key : null);
-    const uploadedFile = Array.isArray(result[type]) ? result[type].at(-1) : result[type];
-    return {
-        fileID: uploadedFile['file_id'],
-        uniqueID: uploadedFile['file_unique_id']
-    };
-};
-
 // Build the log object by message type and user settings
 const buildLogObject = function (content, response, type, options) {
-    if (!response.ok) {
+    if (response.code !== 0) {
         return { type: type, content: false, errorLog: response, timestamp: Date.now(), status: 'fail' };
     }
     else if (options.logs.type === 'timestamp') {
         return { type: type, content: false, timestamp: Date.now(), status: 'success' };
     }
     else if (options.logs.type === 'everything') {
-        const contentObject = ['photo', 'document'].includes(type) ? {
-            ...content,
-            ...getFileIDsFromResponse(response.result)
-        } : content;
-        return { type: type, content: contentObject, timestamp: Date.now(), status: 'success' };
+        return { type: type, content: content, timestamp: Date.now(), status: 'success' };
     }
     else {
         return false;
@@ -299,7 +236,7 @@ const handleBadgeText = async function (success) {
     }
 };
 
-// Send the message to Telegram Bot API and handle the response
+// Send the message to Feishu API and handle the response
 const sendMessage = async function (content, type, tab) {
     try {
         if (!content || !messageTypes.includes(type)) {
@@ -307,17 +244,17 @@ const sendMessage = async function (content, type, tab) {
         }
         // Build the request parameters and message object
         const options = await getStorageData('options');
-        const requestURL = buildRequestURL(type, options);
+        const requestURL = buildRequestURL();
         const requestParameters = buildPostData(type, content, options);
         const activeAccount = options.connections.setup[options.connections.use];
-        // Check if the Bot API key and chat ID are set
-        if (!activeAccount.key || !activeAccount.chatId) {
+        // Check if the App ID, App Secret and chat ID are set
+        if (!activeAccount.appId || !activeAccount.key || !activeAccount.chatId) {
             return await handleAPIResponse({
-                ok: false,
-                description: 'Please set up your Telegram bot token and chat ID to start sending messages.'
+                code: 400,
+                msg: 'Please set up your Feishu app ID, app secret and chat ID to start sending messages.'
             });
         }
-        // Send the request to Telegram Bot API
+        // Send the request to Feishu API
         const sendRequest = await fetchAPI(requestURL, requestParameters);
         const response = await sendRequest.json();
         // Register the API response to the extension storage to use it later
@@ -330,7 +267,7 @@ const sendMessage = async function (content, type, tab) {
         const apiResponse = await getStorageData('lastAPIResponse');
         await setStorageData('lastAPIResponse', {});
         // Show status badge on the extension's icon
-        await handleBadgeText(apiResponse.ok);
+        await handleBadgeText(apiResponse.code === 0);
         // If the browser is not in Incognito Mode, register the message log
         if (!tab.incognito) {
             await registerLog(content, apiResponse, type);

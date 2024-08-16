@@ -7,8 +7,8 @@ const updateWizardSections = function ({ heading, button }) {
     const step = getCurrentStep();
     selectById('wizard-heading').innerText = heading;
     document.querySelector('#wizard-content div:not(.display-none)').classList.toggle('display-none'),
-    document.querySelector(`.content-part-${step}`).classList.toggle('display-none'),
-    selectById('wizard-button-text').innerText = button;
+        document.querySelector(`.content-part-${step}`).classList.toggle('display-none'),
+        selectById('wizard-button-text').innerText = button;
 };
 
 const wizardStepHandler = async function () {
@@ -16,20 +16,20 @@ const wizardStepHandler = async function () {
     switch (step) {
         case 2:
             updateWizardSections({
-                heading: 'First things first...',
-                button: 'I got the token!'
+                heading: 'Let\'s set up your Feishu App...',
+                button: 'I got the App ID and Secret!'
             });
             break;
         case 3:
             updateWizardSections({
-                heading:  'Every good chat...',
-                button: 'That was easy!'
+                heading:  'Now, let\'s set up the chat...',
+                button: 'I got the chat ID!'
             });
             break;
         case 4:
             updateWizardSections({
                 heading: 'Almost there... 🏁',
-                button: 'Bring me to Settings Page!'
+                button: 'Take me to the Settings Page!'
             });
             break;
         case 5:

@@ -1,5 +1,5 @@
-import { setStorageData } from './../../utils/storage.js';
-import { defaultSettings } from './../../utils/constants.js';
+import { setStorageData } from '../../utils/storage';
+import { defaultSettings } from '../../utils/constants';
 
 const getById = id => document.getElementById(id);
 

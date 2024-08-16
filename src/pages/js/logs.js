@@ -82,12 +82,12 @@ const createLogDetailsElement = function (log, type, content) {
         case 'page':
             modifiedType = 'link';
             break;
-        case 'photo':
-        case 'document':
-            modifiedType = 'photo';
+        case 'image':
+        case 'file':
+            modifiedType = 'image';
             break;
     }
-    const isErrorLog = log.errorLog && (log.errorLog.ok === false || Object.keys(log.errorLog).length === 0);
+    const isErrorLog = log.errorLog && (log.errorLog.code !== 0 || Object.keys(log.errorLog).length === 0);
     if (isErrorLog) {
         modifiedType = 'error';
     }
@@ -98,10 +98,10 @@ const createLogDetailsElement = function (log, type, content) {
     let errorMsg;
     if (isErrorLog) {
         const errorMsgContainer = clone.querySelector('.error-message');
-        if (!log.errorLog.description) {
+        if (!log.errorLog.msg) {
             errorMsg = 'Unknown error';
         } else {
-            errorMsg = log.errorLog.description.includes('wrong file identifier') ? 'Unsupported file type or header' : log.errorLog.description;
+            errorMsg = log.errorLog.msg;
         }
         errorMsgContainer.textContent = errorMsg;
         return clone;
@@ -124,11 +124,11 @@ const createLogDetailsElement = function (log, type, content) {
                 clone.querySelector('.source-container').classList.remove('display-none');
             }
             break;
-        case 'photo':
-        case 'document':
+        case 'image':
+        case 'file':
             img = clone.querySelector('.sent-image');
-            img.src = content.srcUrl;
-            img.dataset.uniqueId = content.uniqueID;
+            img.src = content.image_key ? `https://open.feishu.cn/open-apis/image/v4/${content.image_key}` : content.file_key;
+            img.dataset.uniqueId = content.image_key || content.file_key;
             break;
     }
 
@@ -182,7 +182,7 @@ const displayLogItems = function (page) {
     for (let i = startIndex; i < endIndex && i < logs.length; i++) {
 
         const { type, content, timestamp, status, errorLog } = logs[i];
-        const modifiedType = type === 'document' ? 'photo' : type;
+        const modifiedType = type === 'file' ? 'image' : type;
 
         const logViewTemplate = document.querySelector('#single-log-view-template');
         const logView = logViewTemplate.content.cloneNode(true);
@@ -220,7 +220,7 @@ const displayLogItems = function (page) {
 
         [elements.logViewStatus.src, elements.logViewStatus.width, elements.logViewStatus.alt] = [getIconPath(status), status === 'fail' ? 18 : 21, status];
 
-        const isErrorLog = errorLog && (errorLog.ok === false || Object.keys(errorLog).length === 0);
+        const isErrorLog = errorLog && (errorLog.code !== 0 || Object.keys(errorLog).length === 0);
 
         if (!content && !isErrorLog) {
             elements.logViewExpand.src = getIconPath('eye-slash');
